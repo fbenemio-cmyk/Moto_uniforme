@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verifica moto uniforme · Collettori circolari e scatolari</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,400&family=Manrope:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1c5a96" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14161c" media="(prefers-color-scheme: dark)">
+<meta name="application-name" content="Moto uniforme">
+<meta name="description" content="Verifica idraulica di collettori circolari e rettangolari scatolari secondo Manning–Strickler">
+<!-- iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Moto uniforme">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<style>
+:root {
+  --bg-base: #fbfaf6;
+  --bg-surface: #f1ede4;
+  --bg-card: #ffffff;
+  --bg-card-soft: #f9f7f2;
+  --text-primary: #1a1d24;
+  --text-secondary: #565b66;
+  --text-tertiary: #8d92a0;
+  --border: rgba(26, 29, 36, 0.08);
+  --border-strong: rgba(26, 29, 36, 0.16);
+  --accent: #1c5a96;
+  --accent-soft: #e8eff7;
+  --water: #7BB8E8;
+  --water-line: #1E5A99;
+  --warning: #C5532A;
+  --warning-soft: #f5e6dd;
+  --warning-dark: #7a3019;
+  --success: #2d7a4f;
+  --success-soft: #e5efe7;
+  --success-dark: #19452c;
+  --danger: #b73a2a;
+  --danger-soft: #f5dfd9;
+  --danger-dark: #6d2317;
+  --rule: #d4cfc1;
+  --shadow-card: 0 1px 2px rgba(26,29,36,0.04), 0 4px 14px rgba(26,29,36,0.04);
+  --font-display: "Newsreader","Times New Roman",serif;
+  --font-body: "Manrope",-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-mono: "JetBrains Mono","SF Mono","Menlo",monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-base: #14161c;
+    --bg-surface: #1d2027;
+    --bg-card: #252932;
+    --bg-card-soft: #2a2e38;
+    --text-primary: #ebeef4;
+    --text-secondary: #a7adba;
+    --text-tertiary: #6f7585;
+    --border: rgba(235,238,244,0.08);
+    --border-strong: rgba(235,238,244,0.20);
+    --accent: #6ba9d8;
+    --accent-soft: rgba(107,169,216,0.15);
+    --water: #5290c2;
+    --water-line: #7bb8e8;
+    --warning: #e07c4f;
+    --warning-soft: rgba(224,124,79,0.16);
+    --warning-dark: #f0a986;
+    --success: #6abe8a;
+    --success-soft: rgba(106,190,138,0.14);
+    --success-dark: #b5dcc4;
+    --danger: #e07560;
+    --danger-soft: rgba(224,117,96,0.16);
+    --danger-dark: #f0a899;
+    --rule: rgba(235,238,244,0.12);
+    --shadow-card: 0 1px 2px rgba(0,0,0,0.3), 0 4px 14px rgba(0,0,0,0.25);
+  }
+}
+* { box-sizing: border-box; }
+html { background: var(--bg-base); }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-primary);
+  background: var(--bg-base);
+  background-image: radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);
+  background-size: 28px 28px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.page { max-width: 1040px; margin: 0 auto; padding: 48px 32px 64px; }
+@media (max-width: 640px) { .page { padding: 28px 16px 40px; } }
+
+/* Header */
+.page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding-bottom: 26px; margin-bottom: 30px; border-bottom: 1px solid var(--rule); flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 18px; }
+.brand-mark { width: 54px; height: 54px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-strong); position: relative; flex-shrink: 0; overflow: hidden; }
+.brand-mark::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 40%; background: var(--water); opacity: 0.85; }
+.brand h1 { font-family: var(--font-display); font-weight: 400; font-size: 30px; letter-spacing: -0.012em; line-height: 1.05; margin: 0 0 4px; font-variation-settings: "opsz" 36; font-style: italic; }
+.brand p { margin: 0; font-size: 13px; color: var(--text-secondary); letter-spacing: 0.005em; }
+.tag { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-tertiary); padding: 6px 11px; border: 1px solid var(--border-strong); border-radius: 999px; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; }
+
+/* Panels */
+.panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 24px 26px; margin-bottom: 18px; box-shadow: var(--shadow-card); }
+.panel-title { display: flex; align-items: baseline; gap: 12px; margin: 0 0 20px; font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 20px; color: var(--text-primary); font-variation-settings: "opsz" 24; }
+.panel-title::before { content: ''; display: inline-block; width: 3px; height: 16px; background: var(--accent); border-radius: 2px; transform: translateY(3px); }
+.panel-title small { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-tertiary); font-style: normal; margin-left: auto; font-weight: 500; }
+
+/* Form */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; }
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field label { font-size: 11.5px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; }
+.field .row { display: flex; align-items: center; gap: 8px; }
+.field input, .field select { flex: 1; min-width: 0; height: 40px; padding: 0 12px; font-family: var(--font-mono); font-size: 14px; color: var(--text-primary); background: var(--bg-card-soft); border: 1px solid var(--border-strong); border-radius: 8px; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; -moz-appearance: none; appearance: none; touch-action: manipulation; }
+@media (max-width: 640px) {
+  .field input, .field select { height: 46px; font-size: 15px; }
+  .field label { font-size: 12px; }
+  .stat-value { font-size: 16px; }
+  .panel { padding: 18px 16px; }
+}
+.field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%238d92a0' d='M5 6 0 0h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px; cursor: pointer; }
+.field input:focus, .field select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.field .unit { font-family: var(--font-mono); font-size: 12px; color: var(--text-tertiary); min-width: 28px; }
+.field .hint { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-tertiary); letter-spacing: 0.02em; margin-top: -1px; }
+
+/* Visualization */
+.viz-row { display: grid; grid-template-columns: 280px 1fr; gap: 28px; align-items: center; margin-bottom: 22px; padding: 4px 0; }
+@media (max-width: 720px) { .viz-row { grid-template-columns: 1fr; gap: 28px; } }
+#pipeSvg { width: 100%; max-width: 280px; display: block; margin: 0 auto; }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 4px; }
+.stat { background: var(--bg-card-soft); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.stat-label { font-size: 11px; color: var(--text-tertiary); letter-spacing: 0.04em; text-transform: uppercase; line-height: 1.3; font-weight: 500; }
+.stat-value { font-family: var(--font-mono); font-size: 17px; font-weight: 500; color: var(--text-primary); margin-top: 4px; letter-spacing: -0.01em; }
+.stat-value sub, .stat-label sub { font-size: 0.75em; }
+
+/* Status */
+.status { margin-top: 16px; padding: 12px 16px; border-radius: 10px; font-size: 13.5px; line-height: 1.5; display: flex; align-items: flex-start; gap: 12px; border: 1px solid transparent; }
+.status::before { content: ''; display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+.status.good { background: var(--success-soft); color: var(--success-dark); border-color: rgba(45,122,79,0.18); }
+.status.good::before { background: var(--success); }
+.status.warn { background: var(--warning-soft); color: var(--warning-dark); border-color: rgba(197,83,42,0.18); }
+.status.warn::before { background: var(--warning); }
+.status.bad { background: var(--danger-soft); color: var(--danger-dark); border-color: rgba(183,58,42,0.22); }
+.status.bad::before { background: var(--danger); }
+
+/* Method note */
+.note { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px 26px; margin-top: 8px; font-size: 13.5px; line-height: 1.65; color: var(--text-secondary); }
+.note h3 { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 17px; color: var(--text-primary); margin: 0 0 10px; font-variation-settings: "opsz" 20; }
+.note code { font-family: var(--font-mono); font-size: 12.5px; background: var(--bg-card); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border); color: var(--text-primary); }
+.formula { display: block; font-family: var(--font-mono); font-size: 13px; text-align: center; margin: 12px 0; color: var(--text-primary); padding: 12px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border); }
+
+/* Footer */
+.page-footer { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--rule); font-family: var(--font-mono); font-size: 10.5px; color: var(--text-tertiary); letter-spacing: 0.04em; text-transform: uppercase; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+
+/* Print */
+@media print {
+  html, body { background: white !important; }
+  body { background-image: none !important; }
+  .page { padding: 0; max-width: none; }
+  .panel { box-shadow: none; border-color: #ccc; break-inside: avoid; }
+  .field input, .field select { border-color: #ccc; }
+  .page-header { border-color: #ccc; }
+  .note { background: white; border-color: #ddd; }
+}
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* Element classes for chart in dark mode handled via CSS vars */
+.chart-curve { stroke: var(--accent); }
+.chart-axis { stroke: var(--text-secondary); }
+.chart-tick { stroke: var(--text-secondary); }
+.chart-label { fill: var(--text-secondary); }
+.chart-grid { stroke: var(--border-strong); }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="page-header">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true"></div>
+    <div>
+      <h1>Verifica moto uniforme</h1>
+      <p>Collettori a sezione circolare e rettangolare scatolare — formula di Manning–Strickler</p>
+    </div>
+  </div>
+  <div class="tag">v 1.0</div>
+</header>
+
+<h2 class="sr-only">Applicazione di verifica del moto uniforme</h2>
+
+<section class="panel" aria-labelledby="inputs-title">
+  <h2 class="panel-title" id="inputs-title">Dati di progetto<small>input</small></h2>
+  <div class="grid2">
+    <div class="field">
+      <label for="sectionType">Tipo di sezione</label>
+      <div class="row"><select id="sectionType">
+        <option value="circ">Circolare</option>
+        <option value="rect">Rettangolare (scatolare)</option>
+      </select></div>
+    </div>
+    <div class="field">
+      <label for="material">Materiale (scabrezza)</label>
+      <div class="row"><select id="material"></select></div>
+      <div class="hint" id="specHint">—</div>
+    </div>
+    <div class="field circ-only" id="dnFieldWrap">
+      <label for="diameter">Diametro nominale DN</label>
+      <div class="row"><select id="diameter"></select></div>
+      <input type="number" id="diameterCustom" min="50" max="4000" step="10" placeholder="diametro interno (mm)" style="display:none;">
+    </div>
+    <div class="field circ-only" id="dnSpacer"></div>
+    <div class="field rect-only" id="baseFieldWrap" style="display:none">
+      <label for="base">Base interna B</label>
+      <div class="row"><input type="number" id="base" value="800" min="100" max="6000" step="50"><span class="unit">mm</span></div>
+    </div>
+    <div class="field rect-only" id="heightFieldWrap" style="display:none">
+      <label for="height">Altezza interna H</label>
+      <div class="row"><input type="number" id="height" value="600" min="100" max="5000" step="50"><span class="unit">mm</span></div>
+    </div>
+    <div class="field">
+      <label for="slope">Pendenza i</label>
+      <div class="row"><input type="number" id="slope" value="0.5" min="0.05" max="20" step="0.05"><span class="unit">%</span></div>
+    </div>
+    <div class="field">
+      <label for="flow">Portata Q</label>
+      <div class="row"><input type="number" id="flow" value="30" min="0.01" max="50000" step="0.5"><span class="unit">L/s</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" aria-labelledby="results-title">
+  <h2 class="panel-title" id="results-title">Sezione bagnata e scala di deflusso<small>output</small></h2>
+  <div class="viz-row">
+    <div>
+      <svg id="pipeSvg" viewBox="0 0 280 240" role="img" aria-label="Sezione bagnata con riempimento in azzurro e barra graduata">
+        <g id="sectionContent"></g>
+        <text x="225" y="14" text-anchor="middle" font-size="9" fill="var(--text-tertiary)" id="barTitle" style="font-family: var(--font-mono); letter-spacing: 0.05em;">h/D (%)</text>
+        <rect x="215" y="20" width="20" height="160" fill="var(--bg-card-soft)" stroke="var(--text-primary)" stroke-width="1"/>
+        <rect id="barFillRect" x="215" y="180" width="20" height="0" fill="var(--water)" opacity="0.85"/>
+        <line x1="215" y1="140" x2="235" y2="140" stroke="var(--text-tertiary)" stroke-width="0.4" stroke-dasharray="1,2" opacity="0.55"/>
+        <line x1="215" y1="100" x2="235" y2="100" stroke="var(--text-tertiary)" stroke-width="0.4" stroke-dasharray="1,2" opacity="0.55"/>
+        <line x1="215" y1="60" x2="235" y2="60" stroke="var(--warning)" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.6"/>
+        <line id="barSurfaceLine" x1="213" y1="180" x2="237" y2="180" stroke="var(--water-line)" stroke-width="0.9" stroke-dasharray="2,2" style="display:none"/>
+        <line x1="235" y1="20" x2="239" y2="20" stroke="var(--text-secondary)" stroke-width="0.5"/>
+        <text x="241" y="23" font-size="9" fill="var(--text-secondary)" style="font-family: var(--font-mono);">100</text>
+        <line x1="235" y1="60" x2="239" y2="60" stroke="var(--warning)" stroke-width="0.8"/>
+        <text x="241" y="63" font-size="9" fill="var(--warning)" font-weight="500" style="font-family: var(--font-mono);">75</text>
+        <line x1="235" y1="100" x2="239" y2="100" stroke="var(--text-secondary)" stroke-width="0.5"/>
+        <text x="241" y="103" font-size="9" fill="var(--text-secondary)" style="font-family: var(--font-mono);">50</text>
+        <line x1="235" y1="140" x2="239" y2="140" stroke="var(--text-secondary)" stroke-width="0.5"/>
+        <text x="241" y="143" font-size="9" fill="var(--text-secondary)" style="font-family: var(--font-mono);">25</text>
+        <line x1="235" y1="180" x2="239" y2="180" stroke="var(--text-secondary)" stroke-width="0.5"/>
+        <text x="241" y="183" font-size="9" fill="var(--text-secondary)" style="font-family: var(--font-mono);">0</text>
+      </svg>
+    </div>
+    <div id="ratingChart"></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Tirante idrico h</div><div class="stat-value" id="hValue">—</div></div>
+    <div class="stat"><div class="stat-label" id="fillStatLabel">Grado riempimento h/D</div><div class="stat-value" id="fillValue">—</div></div>
+    <div class="stat"><div class="stat-label">Velocità v</div><div class="stat-value" id="velValue">—</div></div>
+    <div class="stat"><div class="stat-label">Raggio idraulico R<sub>h</sub></div><div class="stat-value" id="rhValue">—</div></div>
+    <div class="stat"><div class="stat-label">Q a sezione piena</div><div class="stat-value" id="qfullValue">—</div></div>
+    <div class="stat"><div class="stat-label">Coefficienti</div><div class="stat-value" id="nValue" style="font-size:13px;">—</div></div>
+  </div>
+  <div id="status" class="status good"><span id="statusText">Inserire i dati per avviare la verifica</span></div>
+</section>
+
+<aside class="note">
+  <h3>Metodologia di calcolo</h3>
+  La verifica risolve in modo iterativo (bisezione) l'equazione di Manning per moto uniforme:
+  <span class="formula">Q = (1/n) · A · R<sub>h</sub><sup>2/3</sup> · √i</span>
+  Per la sezione circolare: <code>A = (D²/8)(θ − sin θ)</code>, <code>P = Dθ/2</code>, <code>h = (D/2)(1 − cos(θ/2))</code>.
+  Per la sezione rettangolare: <code>A = B·h</code>, <code>P = B + 2h</code>, regime di canale aperto.
+  I limiti progettuali (h/D, h/H ≤ 75%; v autopulizia ≥ 0,5 m/s; v erosione ≤ 5 m/s) seguono la prassi italiana per fognature nere/miste. Le verifiche definitive vanno comunque condotte secondo norme UNI EN, DM 12/12/1985 e regolamenti d'ente.
+</aside>
+
+<footer class="page-footer">
+  <span>Manning–Strickler · sezioni circolare e rettangolare</span>
+  <span>Strumento di pre-dimensionamento idraulico</span>
+</footer>
+
+</div>
+
+<script>
+const materials = {
+  pvc_sn4:        { name: 'PVC compatto SN 4', n: 0.010, spec: 'UNI EN 1401 SDR 41 (DN/OD)',
+                    sizes: [{dn:110,di:103.6},{dn:125,di:118.6},{dn:160,di:152.0},{dn:200,di:190.2},{dn:250,di:237.6},{dn:315,di:299.6},{dn:400,di:380.4},{dn:500,di:475.4},{dn:630,di:599.2}] },
+  pvc_sn8:        { name: 'PVC compatto SN 8', n: 0.010, spec: 'UNI EN 1401 SDR 34 (DN/OD)',
+                    sizes: [{dn:110,di:103.6},{dn:125,di:117.6},{dn:160,di:150.6},{dn:200,di:188.2},{dn:250,di:235.4},{dn:315,di:296.6},{dn:400,di:376.6},{dn:500,di:470.8},{dn:630,di:593.2},{dn:800,di:753.2}] },
+  hdpe_compatto:  { name: 'PEAD compatto (PE100 SDR17)', n: 0.010, spec: 'UNI EN 12201 (DN/OD, PN10)',
+                    sizes: [{dn:110,di:96.8},{dn:125,di:110.2},{dn:160,di:141.0},{dn:180,di:158.6},{dn:200,di:176.2},{dn:225,di:198.2},{dn:250,di:220.4},{dn:280,di:246.8},{dn:315,di:277.6},{dn:355,di:312.8},{dn:400,di:352.6},{dn:450,di:396.6},{dn:500,di:440.6},{dn:560,di:493.6},{dn:630,di:555.2},{dn:710,di:625.8},{dn:800,di:705.2},{dn:900,di:793.4},{dn:1000,di:881.4},{dn:1200,di:1057.8}] },
+  hdpe_corr_sn4:  { name: 'PEAD corrugato SN 4', n: 0.010, spec: 'UNI EN 13476-3 tipo B (DN/ID)',
+                    sizes: [{dn:200,di:200},{dn:250,di:250},{dn:300,di:300},{dn:400,di:400},{dn:500,di:500},{dn:600,di:600},{dn:800,di:800},{dn:1000,di:1000},{dn:1200,di:1200}] },
+  hdpe_corr_sn8:  { name: 'PEAD corrugato SN 8', n: 0.010, spec: 'UNI EN 13476-3 tipo B (DN/ID)',
+                    sizes: [{dn:200,di:200},{dn:250,di:250},{dn:300,di:300},{dn:400,di:400},{dn:500,di:500},{dn:600,di:600},{dn:800,di:800},{dn:1000,di:1000},{dn:1200,di:1200},{dn:1400,di:1400},{dn:1600,di:1600}] },
+  prfv:           { name: 'PRFV (vetroresina)', n: 0.010, spec: 'UNI EN 14364 (DN/ID)',
+                    sizes: [{dn:100,di:100},{dn:150,di:150},{dn:200,di:200},{dn:250,di:250},{dn:300,di:300},{dn:400,di:400},{dn:500,di:500},{dn:600,di:600},{dn:700,di:700},{dn:800,di:800},{dn:900,di:900},{dn:1000,di:1000},{dn:1200,di:1200},{dn:1400,di:1400},{dn:1600,di:1600},{dn:1800,di:1800},{dn:2000,di:2000},{dn:2400,di:2400},{dn:3000,di:3000}] },
+  acciaio:        { name: 'Acciaio nuovo', n: 0.012, spec: 'UNI EN 10220',
+                    sizes: [{dn:80,di:82.5},{dn:100,di:107.1},{dn:125,di:132.5},{dn:150,di:159.3},{dn:200,di:206.5},{dn:250,di:260.4},{dn:300,di:309.7},{dn:350,di:339.6},{dn:400,di:388.8},{dn:500,di:489.0},{dn:600,di:589.0},{dn:700,di:686.0},{dn:800,di:790.0},{dn:1000,di:990.0},{dn:1200,di:1190.0}] },
+  ghisa:          { name: 'Ghisa sferoidale', n: 0.013, spec: 'UNI EN 598',
+                    sizes: [{dn:80,di:82},{dn:100,di:102},{dn:125,di:127},{dn:150,di:154},{dn:200,di:204},{dn:250,di:254},{dn:300,di:306},{dn:350,di:356},{dn:400,di:406},{dn:500,di:508},{dn:600,di:610},{dn:700,di:712},{dn:800,di:814},{dn:900,di:916},{dn:1000,di:1018},{dn:1200,di:1222},{dn:1400,di:1426},{dn:1600,di:1632},{dn:1800,di:1836},{dn:2000,di:2042}] },
+  cls_pref:       { name: 'CLS prefabbricato', n: 0.013, spec: 'UNI EN 1916 (circ.) / UNI EN 14844 (scatolare)',
+                    sizes: [{dn:300,di:300},{dn:400,di:400},{dn:500,di:500},{dn:600,di:600},{dn:800,di:800},{dn:1000,di:1000},{dn:1200,di:1200},{dn:1400,di:1400},{dn:1500,di:1500},{dn:1600,di:1600},{dn:1800,di:1800},{dn:2000,di:2000},{dn:2200,di:2200},{dn:2500,di:2500},{dn:3000,di:3000}] },
+  cls_gettato:    { name: 'CLS gettato in opera', n: 0.015, spec: 'sezioni speciali',
+                    sizes: [{dn:800,di:800},{dn:1000,di:1000},{dn:1200,di:1200},{dn:1500,di:1500},{dn:1800,di:1800},{dn:2000,di:2000},{dn:2500,di:2500},{dn:3000,di:3000},{dn:3500,di:3500},{dn:4000,di:4000}] },
+  gres:           { name: 'Gres ceramico', n: 0.013, spec: 'UNI EN 295 (DN/ID)',
+                    sizes: [{dn:100,di:100},{dn:125,di:125},{dn:150,di:150},{dn:200,di:200},{dn:250,di:250},{dn:300,di:300},{dn:400,di:400},{dn:500,di:500},{dn:600,di:600},{dn:700,di:700},{dn:800,di:800},{dn:1000,di:1000},{dn:1200,di:1200}] },
+  muratura:       { name: 'Muratura/pietrame', n: 0.017, spec: 'dimensioni indicative',
+                    sizes: [{dn:400,di:400},{dn:500,di:500},{dn:600,di:600},{dn:800,di:800},{dn:1000,di:1000},{dn:1200,di:1200},{dn:1500,di:1500},{dn:1800,di:1800},{dn:2000,di:2000},{dn:2500,di:2500}] }
+};
+
+const matSel = document.getElementById('material');
+const dnSel = document.getElementById('diameter');
+const customInput = document.getElementById('diameterCustom');
+const specHint = document.getElementById('specHint');
+const sectionSel = document.getElementById('sectionType');
+let sectionType = 'circ';
+
+for (const [k, m] of Object.entries(materials)) {
+  const o = document.createElement('option');
+  o.value = k; o.textContent = `${m.name} — n = ${m.n.toFixed(3)}`;
+  matSel.appendChild(o);
+}
+matSel.value = 'pvc_sn8';
+
+function fmtIt(v, d) { return v.toFixed(d).replace('.', ','); }
+
+function populateDiameters(matKey, preferredDi) {
+  const mat = materials[matKey];
+  dnSel.innerHTML = '';
+  mat.sizes.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.di; opt.dataset.dn = s.dn;
+    opt.textContent = (s.dn === s.di) ? `DN ${s.dn}` : `DN ${s.dn} — di ${fmtIt(s.di, 1)} mm`;
+    dnSel.appendChild(opt);
+  });
+  const customOpt = document.createElement('option');
+  customOpt.value = 'custom'; customOpt.dataset.dn = '';
+  customOpt.textContent = '— diametro personalizzato —';
+  dnSel.appendChild(customOpt);
+  let best = mat.sizes[Math.floor(mat.sizes.length / 2)];
+  if (preferredDi != null && isFinite(preferredDi)) {
+    let bd = Infinity;
+    for (const s of mat.sizes) { const d = Math.abs(s.di - preferredDi); if (d < bd) { bd = d; best = s; } }
+  }
+  dnSel.value = best.di;
+}
+
+function getCurrentDi() {
+  if (dnSel.value === 'custom') { const v = parseFloat(customInput.value); return isNaN(v) ? NaN : v; }
+  return parseFloat(dnSel.value);
+}
+
+function manningQ_circ(theta, D, n, S) {
+  if (theta <= 0) return 0;
+  const A = (D*D/8) * (theta - Math.sin(theta));
+  const P = D * theta / 2;
+  return (1/n) * A * Math.pow(A/P, 2/3) * Math.sqrt(S);
+}
+const THETA_MAX = 5.2778;
+function solveTheta(Q, D, n, S) {
+  if (manningQ_circ(THETA_MAX, D, n, S) < Q) return null;
+  let lo = 0.0005, hi = THETA_MAX;
+  for (let i = 0; i < 80; i++) {
+    const mid = (lo + hi) / 2;
+    if (manningQ_circ(mid, D, n, S) < Q) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+function manningQ_rect(y, b, H, n, S) {
+  if (y <= 0) return 0;
+  const yy = Math.min(y, H);
+  const A = b * yy;
+  const P = b + 2 * yy;
+  return (1/n) * A * Math.pow(A/P, 2/3) * Math.sqrt(S);
+}
+function solveY(Q, b, H, n, S) {
+  const Qfull = manningQ_rect(H, b, H, n, S);
+  if (Q > Qfull) return null;
+  let lo = 1e-6, hi = H;
+  for (let i = 0; i < 80; i++) {
+    const mid = (lo + hi) / 2;
+    if (manningQ_rect(mid, b, H, n, S) < Q) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+function chooseAxisMax(rawMax) {
+  if (rawMax <= 0) return 1;
+  const rawStep = rawMax / 5;
+  const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+  const norm = rawStep / mag;
+  let s;
+  if (norm <= 1) s = 1; else if (norm <= 2) s = 2; else if (norm <= 2.5) s = 2.5; else if (norm <= 5) s = 5; else s = 10;
+  return Math.ceil(rawMax / (s*mag)) * (s*mag);
+}
+function fmtNum(v) {
+  if (v === 0) return '0';
+  if (Math.abs(v) >= 100) return Math.round(v).toString();
+  if (Math.abs(v) >= 10) return v.toFixed(0);
+  if (Math.abs(v) >= 1) return v.toFixed(1);
+  return v.toFixed(2);
+}
+
+function renderCircSVG(D_mm, h_m, fillDeg, dnLabel) {
+  const cx = 110, cy = 100, R = 80;
+  const f = Math.max(0, Math.min(1, fillDeg));
+  const waterY = cy + R - 2*R*f;
+  const waterH = cy + R - waterY + 1;
+  let svg = `<defs><clipPath id="waterClipC"><rect x="20" y="${waterY.toFixed(2)}" width="180" height="${waterH.toFixed(2)}"/></clipPath></defs>`;
+  svg += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="var(--water)" clip-path="url(#waterClipC)" opacity="0.85"/>`;
+  svg += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="var(--text-primary)" stroke-width="1.5"/>`;
+  if (f > 0 && f < 1) {
+    const dy = waterY - cy; const dx = Math.sqrt(Math.max(0, R*R - dy*dy));
+    svg += `<line x1="${(cx-dx).toFixed(2)}" y1="${waterY.toFixed(2)}" x2="${(cx+dx).toFixed(2)}" y2="${waterY.toFixed(2)}" stroke="var(--water-line)" stroke-width="0.8" stroke-dasharray="3,2"/>`;
+  }
+  svg += `<line x1="30" y1="198" x2="190" y2="198" stroke="var(--text-secondary)" stroke-width="0.5"/>`;
+  svg += `<line x1="30" y1="194" x2="30" y2="202" stroke="var(--text-secondary)" stroke-width="0.5"/>`;
+  svg += `<line x1="190" y1="194" x2="190" y2="202" stroke="var(--text-secondary)" stroke-width="0.5"/>`;
+  svg += `<text x="${cx}" y="215" text-anchor="middle" font-size="11" fill="var(--text-secondary)" style="font-family: var(--font-mono);">${dnLabel}</text>`;
+  const hMsg = (h_m != null) ? `h = ${fmtIt(h_m*1000, 1)} mm  (${fmtIt(f*100, 1)}%)` : 'h = —';
+  svg += `<text x="${cx}" y="230" text-anchor="middle" font-size="10" fill="var(--text-tertiary)" style="font-family: var(--font-mono);">${hMsg}</text>`;
+  return svg;
+}
+
+function renderRectSVG(b_mm, H_mm, y_m, fillDeg) {
+  const cx = 110, cy = 100;
+  const rH = 160;
+  const ar = b_mm / H_mm;
+  let rW = rH * ar;
+  if (rW > 180) rW = 180;
+  if (rW < 28) rW = 28;
+  const rx = cx - rW/2, ry = cy - rH/2;
+  const f = Math.max(0, Math.min(1, fillDeg));
+  const wH = rH * f;
+  const wY = ry + rH - wH;
+  let svg = '';
+  if (wH > 0.1) svg += `<rect x="${rx.toFixed(2)}" y="${wY.toFixed(2)}" width="${rW.toFixed(2)}" height="${wH.toFixed(2)}" fill="var(--water)" opacity="0.85"/>`;
+  svg += `<rect x="${rx.toFixed(2)}" y="${ry.toFixed(2)}" width="${rW.toFixed(2)}" height="${rH.toFixed(2)}" fill="none" stroke="var(--text-primary)" stroke-width="1.5"/>`;
+  if (f > 0 && f < 1) svg += `<line x1="${(rx-2).toFixed(2)}" y1="${wY.toFixed(2)}" x2="${(rx+rW+2).toFixed(2)}" y2="${wY.toFixed(2)}" stroke="var(--water-line)" stroke-width="0.8" stroke-dasharray="3,2"/>`;
+  const dimY = ry + rH + 12;
+  svg += `<line x1="${rx.toFixed(2)}" y1="${dimY.toFixed(2)}" x2="${(rx+rW).toFixed(2)}" y2="${dimY.toFixed(2)}" stroke="var(--text-secondary)" stroke-width="0.5"/>`;
+  svg += `<line x1="${rx.toFixed(2)}" y1="${(dimY-3).toFixed(2)}" x2="${rx.toFixed(2)}" y2="${(dimY+3).toFixed(2)}" stroke="var(--text-secondary)" stroke-width="0.5"/>`;
+  svg += `<line x1="${(rx+rW).toFixed(2)}" y1="${(dimY-3).toFixed(2)}" x2="${(rx+rW).toFixed(2)}" y2="${(dimY+3).toFixed(2)}" stroke="var(--text-secondary)" stroke-width="0.5"/>`;
+  svg += `<text x="${cx}" y="215" text-anchor="middle" font-size="11" fill="var(--text-secondary)" style="font-family: var(--font-mono);">B × H = ${b_mm} × ${H_mm} mm</text>`;
+  const hMsg = (y_m != null) ? `h = ${fmtIt(y_m*1000, 1)} mm  (${fmtIt(f*100, 1)}%)` : 'h = —';
+  svg += `<text x="${cx}" y="230" text-anchor="middle" font-size="10" fill="var(--text-tertiary)" style="font-family: var(--font-mono);">${hMsg}</text>`;
+  return svg;
+}
+
+function updateBar(fillDeg) {
+  const f = Math.max(0, Math.min(1, fillDeg));
+  const barTop = 20, barH = 160;
+  const y = barTop + barH * (1 - f);
+  const h = barH * f;
+  document.getElementById('barFillRect').setAttribute('y', y);
+  document.getElementById('barFillRect').setAttribute('height', h);
+  const bsl = document.getElementById('barSurfaceLine');
+  if (f > 0 && f < 1) { bsl.setAttribute('y1', y); bsl.setAttribute('y2', y); bsl.style.display = 'block'; }
+  else bsl.style.display = 'none';
+}
+
+function drawRatingChart(params, n, S, opQ, opFill, pressurized) {
+  const W = 420, H = 230;
+  const ml = 44, mr = 14, mt = 16, mb = 40;
+  const pw = W - ml - mr, ph = H - mt - mb;
+  const pts = [];
+  if (params.type === 'circ') {
+    const N = 140;
+    for (let i = 1; i <= N; i++) {
+      const theta = (i / N) * (2 * Math.PI - 0.0005);
+      const Q = manningQ_circ(theta, params.D, n, S);
+      const h = params.D * (1 - Math.cos(theta/2)) / 2;
+      pts.push({ Q, fill: h/params.D, theta });
+    }
+  } else {
+    const N = 140;
+    for (let i = 1; i <= N; i++) {
+      const yy = (i / N) * params.H;
+      const Q = manningQ_rect(yy, params.b, params.H, n, S);
+      pts.push({ Q, fill: yy/params.H, theta: 0 });
+    }
+  }
+  const Qpeak = Math.max(...pts.map(p => p.Q));
+  let xMaxLs = chooseAxisMax(Qpeak * 1000 * 1.06);
+  if (opQ != null && opQ * 1000 > xMaxLs) xMaxLs = chooseAxisMax(opQ * 1000 * 1.1);
+  const xMax = xMaxLs / 1000;
+  const xs = (Q) => ml + (Q / xMax) * pw;
+  const ys = (f) => mt + (1 - f) * ph;
+
+  let stable, unstable;
+  if (params.type === 'circ') {
+    stable = pts.filter(p => p.theta <= THETA_MAX + 0.04);
+    unstable = pts.filter(p => p.theta >= THETA_MAX - 0.04);
+  } else { stable = pts; unstable = []; }
+  const stableStr = stable.map(p => `${xs(p.Q).toFixed(1)},${ys(p.fill).toFixed(1)}`).join(' ');
+  const unstableStr = unstable.map(p => `${xs(p.Q).toFixed(1)},${ys(p.fill).toFixed(1)}`).join(' ');
+  const yLabel = params.type === 'circ' ? 'h/D (%)' : 'h/H (%)';
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block; max-width:540px; margin:auto;" role="img" aria-label="Scala di deflusso con punto di lavoro">`;
+  for (const f of [0.25, 0.50, 0.75, 1.0]) {
+    const y = ys(f);
+    svg += `<line x1="${ml}" y1="${y}" x2="${ml+pw}" y2="${y}" stroke="var(--border-strong)" stroke-width="0.4" stroke-dasharray="2,3" opacity="0.5"/>`;
+  }
+  const y75 = ys(0.75);
+  svg += `<line x1="${ml}" y1="${y75}" x2="${ml+pw}" y2="${y75}" stroke="var(--warning)" stroke-width="0.9" stroke-dasharray="4,3"/>`;
+  svg += `<text x="${ml+pw-4}" y="${y75-4}" text-anchor="end" font-size="9" fill="var(--warning)" style="font-family: var(--font-mono);">limite consigliato 75%</text>`;
+  svg += `<line x1="${ml}" y1="${mt}" x2="${ml}" y2="${mt+ph}" stroke="var(--text-secondary)" stroke-width="0.6"/>`;
+  svg += `<line x1="${ml}" y1="${mt+ph}" x2="${ml+pw}" y2="${mt+ph}" stroke="var(--text-secondary)" stroke-width="0.6"/>`;
+  for (const f of [0, 0.25, 0.5, 0.75, 1.0]) {
+    const y = ys(f);
+    svg += `<line x1="${ml-3}" y1="${y}" x2="${ml}" y2="${y}" stroke="var(--text-secondary)" stroke-width="0.5"/>`;
+    svg += `<text x="${ml-5}" y="${y+3}" text-anchor="end" font-size="10" fill="var(--text-secondary)" style="font-family: var(--font-mono);">${(f*100).toFixed(0)}</text>`;
+  }
+  for (let i = 0; i <= 5; i++) {
+    const Qv = (xMax * i) / 5;
+    const x = xs(Qv);
+    svg += `<line x1="${x}" y1="${mt+ph}" x2="${x}" y2="${mt+ph+3}" stroke="var(--text-secondary)" stroke-width="0.5"/>`;
+    svg += `<text x="${x}" y="${mt+ph+14}" text-anchor="middle" font-size="10" fill="var(--text-secondary)" style="font-family: var(--font-mono);">${fmtNum(Qv*1000)}</text>`;
+  }
+  svg += `<text x="${ml+pw/2}" y="${H-6}" text-anchor="middle" font-size="11" fill="var(--text-secondary)" style="font-family: var(--font-mono);">Q (L/s)</text>`;
+  svg += `<text x="14" y="${mt+ph/2}" text-anchor="middle" font-size="11" fill="var(--text-secondary)" transform="rotate(-90 14 ${mt+ph/2})" style="font-family: var(--font-mono);">${yLabel}</text>`;
+  svg += `<polyline points="${stableStr}" fill="none" stroke="var(--accent)" stroke-width="2"/>`;
+  if (unstableStr) svg += `<polyline points="${unstableStr}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.55"/>`;
+
+  if (!pressurized && opQ != null && opFill != null) {
+    const oX = xs(opQ), oY = ys(opFill);
+    if (oX >= ml-1 && oX <= ml+pw+1 && oY >= mt-1 && oY <= mt+ph+1) {
+      svg += `<line x1="${oX}" y1="${mt+ph}" x2="${oX}" y2="${oY}" stroke="var(--warning-dark)" stroke-width="0.8" stroke-dasharray="2,2" opacity="0.7"/>`;
+      svg += `<line x1="${ml}" y1="${oY}" x2="${oX}" y2="${oY}" stroke="var(--warning-dark)" stroke-width="0.8" stroke-dasharray="2,2" opacity="0.7"/>`;
+      svg += `<circle cx="${oX}" cy="${oY}" r="8" fill="var(--warning)" opacity="0.2"/>`;
+      svg += `<circle cx="${oX}" cy="${oY}" r="4" fill="var(--warning)" stroke="var(--bg-card)" stroke-width="1.3"/>`;
+      const goRight = oX < ml + pw - 100;
+      const labelX = goRight ? oX + 8 : oX - 8;
+      const labelAnchor = goRight ? 'start' : 'end';
+      const labelY = oY - 10 > mt + 14 ? oY - 8 : oY + 16;
+      svg += `<text x="${labelX}" y="${labelY}" text-anchor="${labelAnchor}" font-size="10" fill="var(--warning-dark)" font-weight="500" style="font-family: var(--font-mono);">punto di lavoro</text>`;
+      svg += `<text x="${labelX}" y="${labelY + 11}" text-anchor="${labelAnchor}" font-size="9" fill="var(--warning-dark)" opacity="0.85" style="font-family: var(--font-mono);">Q=${fmtIt(opQ*1000, 1)} L/s · ${params.type === 'circ' ? 'h/D' : 'h/H'}=${fmtIt(opFill*100, 1)}%</text>`;
+    }
+  } else if (pressurized) {
+    svg += `<text x="${ml+pw/2}" y="${mt+18}" text-anchor="middle" font-size="11" fill="var(--danger)" font-weight="500" style="font-family: var(--font-mono);">Punto di lavoro fuori scala — sezione in pressione</text>`;
+  }
+  svg += `</svg>`;
+  return svg;
+}
+
+function compute() {
+  const slopePct = parseFloat(document.getElementById('slope').value);
+  const S = slopePct / 100;
+  const Q_Ls = parseFloat(document.getElementById('flow').value);
+  const Q = Q_Ls / 1000;
+  const n = materials[matSel.value].n;
+  const Ks = 1 / n;
+  document.getElementById('nValue').innerHTML = `n = ${n.toFixed(3)} · K<sub>s</sub> = ${Math.round(Ks)}`;
+  specHint.textContent = `riferimento: ${materials[matSel.value].spec}`;
+  const statusEl = document.getElementById('status');
+  const statusText = document.getElementById('statusText');
+
+  if (sectionType === 'circ') {
+    const D_mm = getCurrentDi(), D = D_mm / 1000;
+    let dnLabel;
+    if (dnSel.value === 'custom') dnLabel = isFinite(D_mm) ? `di = ${fmtIt(D_mm, 1)} mm` : 'di = —';
+    else {
+      const opt = dnSel.options[dnSel.selectedIndex];
+      const dn = opt.dataset.dn, di = parseFloat(opt.value);
+      dnLabel = (parseFloat(dn) === di) ? `DN ${dn}` : `DN ${dn} · di ${fmtIt(di, 1)} mm`;
+    }
+    if (!isFinite(D) || !isFinite(S) || !isFinite(Q) || D <= 0 || S <= 0 || Q <= 0) {
+      ['hValue','fillValue','velValue','rhValue','qfullValue'].forEach(id => document.getElementById(id).textContent = '—');
+      statusEl.className = 'status warn';
+      statusText.textContent = 'Inserire valori numerici positivi per tutti i parametri';
+      document.getElementById('sectionContent').innerHTML = renderCircSVG(D_mm, null, 0, dnLabel);
+      updateBar(0);
+      document.getElementById('ratingChart').innerHTML = '';
+      return;
+    }
+    const Qfull = manningQ_circ(2*Math.PI - 1e-4, D, n, S);
+    const Qmax = manningQ_circ(THETA_MAX, D, n, S);
+    document.getElementById('qfullValue').textContent = `${fmtIt(Qfull*1000, 1)} L/s`;
+    const theta = solveTheta(Q, D, n, S);
+    if (theta === null) {
+      document.getElementById('hValue').textContent = '—';
+      document.getElementById('fillValue').textContent = 'in pressione';
+      document.getElementById('velValue').textContent = '—';
+      document.getElementById('rhValue').textContent = '—';
+      statusEl.className = 'status bad';
+      statusText.textContent = `Sezione insufficiente: Q = ${fmtIt(Q_Ls, 1)} L/s supera Q max ≈ ${fmtIt(Qmax*1000, 1)} L/s.`;
+      document.getElementById('sectionContent').innerHTML = renderCircSVG(D_mm, null, 1.0, dnLabel);
+      updateBar(1.0);
+      document.getElementById('ratingChart').innerHTML = drawRatingChart({type:'circ', D}, n, S, Q, null, true);
+      return;
+    }
+    const h = D * (1 - Math.cos(theta/2)) / 2;
+    const fillDeg = h / D;
+    const A = (D*D/8) * (theta - Math.sin(theta));
+    const P = D * theta / 2;
+    const v = Q / A; const Rh = A / P;
+    document.getElementById('hValue').textContent = `${fmtIt(h*1000, 1)} mm`;
+    document.getElementById('fillValue').textContent = `${fmtIt(fillDeg*100, 1)} %`;
+    document.getElementById('velValue').textContent = `${fmtIt(v, 2)} m/s`;
+    document.getElementById('rhValue').textContent = `${fmtIt(Rh*1000, 1)} mm`;
+    let cls = 'good', msgs = [];
+    if (fillDeg <= 0.50) msgs.push('h/D ≤ 50% — ottimo');
+    else if (fillDeg <= 0.75) msgs.push('h/D ≤ 75% — entro il limite raccomandato');
+    else if (fillDeg <= 0.85) { cls = 'warn'; msgs.push('h/D 75–85% — accettabile solo per acque meteoriche'); }
+    else { cls = 'bad'; msgs.push('h/D > 85% — flusso instabile'); }
+    if (v < 0.5) { if (cls === 'good') cls = 'warn'; msgs.push('v < 0,5 m/s: rischio sedimentazione'); }
+    else if (v > 5) { if (cls === 'good') cls = 'warn'; msgs.push('v > 5 m/s: rischio erosione'); }
+    statusEl.className = 'status ' + cls;
+    statusText.textContent = msgs.join(' · ');
+    document.getElementById('sectionContent').innerHTML = renderCircSVG(D_mm, h, fillDeg, dnLabel);
+    updateBar(fillDeg);
+    document.getElementById('ratingChart').innerHTML = drawRatingChart({type:'circ', D}, n, S, Q, fillDeg, false);
+  } else {
+    const b_mm = parseFloat(document.getElementById('base').value);
+    const H_mm = parseFloat(document.getElementById('height').value);
+    const b = b_mm / 1000, H = H_mm / 1000;
+    if (!isFinite(b) || !isFinite(H) || !isFinite(S) || !isFinite(Q) || b <= 0 || H <= 0 || S <= 0 || Q <= 0) {
+      ['hValue','fillValue','velValue','rhValue','qfullValue'].forEach(id => document.getElementById(id).textContent = '—');
+      statusEl.className = 'status warn';
+      statusText.textContent = 'Inserire valori numerici positivi per tutti i parametri';
+      document.getElementById('sectionContent').innerHTML = renderRectSVG(b_mm || 800, H_mm || 600, null, 0);
+      updateBar(0);
+      document.getElementById('ratingChart').innerHTML = '';
+      return;
+    }
+    const Qfull = manningQ_rect(H, b, H, n, S);
+    document.getElementById('qfullValue').textContent = `${fmtIt(Qfull*1000, 1)} L/s`;
+    const y = solveY(Q, b, H, n, S);
+    if (y === null) {
+      document.getElementById('hValue').textContent = '—';
+      document.getElementById('fillValue').textContent = 'in pressione';
+      document.getElementById('velValue').textContent = '—';
+      document.getElementById('rhValue').textContent = '—';
+      statusEl.className = 'status bad';
+      statusText.textContent = `Sezione insufficiente: Q = ${fmtIt(Q_Ls, 1)} L/s supera Q max a sez. piena ≈ ${fmtIt(Qfull*1000, 1)} L/s.`;
+      document.getElementById('sectionContent').innerHTML = renderRectSVG(b_mm, H_mm, null, 1.0);
+      updateBar(1.0);
+      document.getElementById('ratingChart').innerHTML = drawRatingChart({type:'rect', b, H}, n, S, Q, null, true);
+      return;
+    }
+    const fillDeg = y / H;
+    const A = b * y; const P = b + 2 * y;
+    const v = Q / A; const Rh = A / P;
+    document.getElementById('hValue').textContent = `${fmtIt(y*1000, 1)} mm`;
+    document.getElementById('fillValue').textContent = `${fmtIt(fillDeg*100, 1)} %`;
+    document.getElementById('velValue').textContent = `${fmtIt(v, 2)} m/s`;
+    document.getElementById('rhValue').textContent = `${fmtIt(Rh*1000, 1)} mm`;
+    let cls = 'good', msgs = [];
+    if (fillDeg <= 0.50) msgs.push('h/H ≤ 50% — ottimo');
+    else if (fillDeg <= 0.75) msgs.push('h/H ≤ 75% — entro il limite raccomandato');
+    else if (fillDeg <= 0.85) { cls = 'warn'; msgs.push('h/H 75–85% — accettabile solo per acque meteoriche'); }
+    else { cls = 'bad'; msgs.push('h/H > 85% — sezione vicina alla pressione'); }
+    if (v < 0.5) { if (cls === 'good') cls = 'warn'; msgs.push('v < 0,5 m/s: rischio sedimentazione'); }
+    else if (v > 5) { if (cls === 'good') cls = 'warn'; msgs.push('v > 5 m/s: rischio erosione'); }
+    statusEl.className = 'status ' + cls;
+    statusText.textContent = msgs.join(' · ');
+    document.getElementById('sectionContent').innerHTML = renderRectSVG(b_mm, H_mm, y, fillDeg);
+    updateBar(fillDeg);
+    document.getElementById('ratingChart').innerHTML = drawRatingChart({type:'rect', b, H}, n, S, Q, fillDeg, false);
+  }
+}
+
+sectionSel.addEventListener('change', () => {
+  sectionType = sectionSel.value;
+  document.querySelectorAll('.circ-only').forEach(el => el.style.display = sectionType === 'circ' ? '' : 'none');
+  document.querySelectorAll('.rect-only').forEach(el => el.style.display = sectionType === 'rect' ? '' : 'none');
+  document.getElementById('barTitle').textContent = sectionType === 'circ' ? 'h/D (%)' : 'h/H (%)';
+  document.getElementById('fillStatLabel').textContent = sectionType === 'circ' ? 'Grado riempimento h/D' : 'Grado riempimento h/H';
+  if (sectionType === 'rect' && !['cls_pref','cls_gettato','muratura','acciaio'].includes(matSel.value)) matSel.value = 'cls_pref';
+  compute();
+});
+dnSel.addEventListener('change', () => {
+  if (dnSel.value === 'custom') {
+    if (!customInput.value) customInput.value = 300;
+    customInput.style.display = ''; customInput.focus();
+  } else customInput.style.display = 'none';
+  compute();
+});
+customInput.addEventListener('input', compute);
+matSel.addEventListener('change', () => {
+  if (sectionType === 'circ') { const prev = getCurrentDi(); populateDiameters(matSel.value, prev); }
+  customInput.style.display = 'none';
+  compute();
+});
+['slope','flow','base','height'].forEach(id => document.getElementById(id).addEventListener('input', compute));
+
+populateDiameters('pvc_sn8', 300);
+compute();
+
+// Service worker registration for offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
