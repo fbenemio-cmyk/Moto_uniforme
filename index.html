@@ -200,8 +200,47 @@ body {
   .toolbar select { max-width: none; }
 }
 
+/* Note e allegati */
+.field textarea { font-family: var(--font-body); font-size: 14px; line-height: 1.5; padding: 12px 14px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg-card-soft); color: var(--text-primary); resize: vertical; min-height: 90px; width: 100%; box-sizing: border-box; transition: border-color 0.15s, box-shadow 0.15s; }
+.field textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(28, 90, 150, 0.15); }
+.docs-section { margin-top: 22px; }
+.docs-section-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; display: block; }
+.photos-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.photos-controls button { font-family: var(--font-body); font-size: 13px; font-weight: 500; height: 38px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--bg-card-soft); color: var(--text-primary); cursor: pointer; transition: all 0.15s; touch-action: manipulation; }
+.photos-controls button:hover { background: var(--bg-card); border-color: var(--text-tertiary); }
+.photos-count { font-size: 12px; color: var(--text-tertiary); margin-left: auto; font-family: var(--font-mono); }
+.photos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.photo-card { display: flex; flex-direction: column; gap: 6px; }
+.photo-thumb { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: var(--bg-card-soft); border: 1px solid var(--border); cursor: pointer; }
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-delete { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%; background: rgba(20, 30, 50, 0.75); color: white; border: none; cursor: pointer; font-size: 18px; line-height: 1; padding: 0; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+.photo-delete:hover { background: var(--danger); }
+.photo-caption-input { font-family: var(--font-body); font-size: 12px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card-soft); color: var(--text-primary); width: 100%; box-sizing: border-box; }
+.photo-caption-input:focus { outline: none; border-color: var(--accent); }
+.photos-empty { font-size: 13px; color: var(--text-tertiary); font-style: italic; padding: 18px 0; text-align: center; border: 1.5px dashed var(--border); border-radius: 8px; }
+
+/* Lightbox per visualizzazione foto a tutto schermo */
+.lightbox { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.92); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box; }
+.lightbox.open { display: flex; }
+.lightbox-img { max-width: 100%; max-height: 78vh; border-radius: 6px; object-fit: contain; }
+.lightbox-close { position: absolute; top: 16px; right: 16px; width: 42px; height: 42px; border-radius: 50%; background: rgba(255, 255, 255, 0.18); border: none; color: white; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.lightbox-caption { color: white; margin-top: 18px; max-width: 540px; text-align: center; font-size: 14px; line-height: 1.5; }
+
 /* Print header (visibile solo in stampa) */
 .print-header { display: none; }
+
+/* Print: pannello documentazione + foto */
+@media print {
+  .photos-controls { display: none !important; }
+  .photo-delete { display: none !important; }
+  .photo-thumb { cursor: default; }
+  .photos-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 16px !important; page-break-inside: auto; }
+  .photo-card { break-inside: avoid; }
+  .field textarea { border: none !important; background: white !important; padding: 0 !important; font-size: 12px !important; min-height: auto !important; resize: none !important; overflow: visible !important; }
+  .photo-caption-input { border: none !important; background: white !important; padding: 4px 0 !important; font-size: 11px !important; color: #333 !important; font-style: italic; }
+  .docs-section-label { color: #444 !important; }
+  .lightbox { display: none !important; }
+}
 
 /* Print */
 @media print {
@@ -352,6 +391,29 @@ body {
   </div>
   <div id="status" class="status good"><span id="statusText">Inserire i dati per avviare la verifica</span></div>
 </section>
+
+<section class="panel" aria-labelledby="docs-title">
+  <h2 class="panel-title" id="docs-title">Note e allegati<small>documentazione</small></h2>
+  <div class="field">
+    <label for="notes">Annotazioni di progetto</label>
+    <textarea id="notes" rows="4" placeholder="Note sul rilievo, considerazioni progettuali, riferimenti normativi specifici, prescrizioni dell'ente gestore…"></textarea>
+  </div>
+  <div class="docs-section">
+    <span class="docs-section-label">Foto e schizzi</span>
+    <div class="photos-controls">
+      <button id="photoCameraBtn" type="button" title="Scatta una foto con la fotocamera">📷 Scatta foto</button>
+      <button id="photoGalleryBtn" type="button" title="Seleziona una o più foto dalla galleria">🖼 Da galleria</button>
+      <span class="photos-count" id="photosCount">nessuna foto</span>
+    </div>
+    <div class="photos-grid" id="photosGrid"></div>
+  </div>
+</section>
+
+<div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Foto a tutto schermo">
+  <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Chiudi">×</button>
+  <img class="lightbox-img" id="lightboxImg" alt="">
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
 
 <aside class="note">
   <h3>Metodologia di calcolo</h3>
@@ -781,7 +843,139 @@ compute();
 // GESTIONE PROGETTI (localStorage) e STAMPA
 // ===========================================
 const STORAGE_KEY = 'moto_uniforme_projects';
+const MAX_IMAGE_DIM = 1280;
+const IMAGE_QUALITY = 0.7;
 let currentProjectName = '';
+let projectPhotos = [];
+let projectNotes = '';
+
+// --- Compressione immagini lato client ---
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith('image/')) {
+      reject(new Error('File non valido'));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        const maxDim = Math.max(width, height);
+        if (maxDim > MAX_IMAGE_DIM) {
+          const scale = MAX_IMAGE_DIM / maxDim;
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', IMAGE_QUALITY));
+      };
+      img.onerror = () => reject(new Error('Impossibile caricare l\'immagine'));
+      img.src = ev.target.result;
+    };
+    reader.onerror = () => reject(new Error('Impossibile leggere il file'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+}
+
+function renderPhotos() {
+  const grid = document.getElementById('photosGrid');
+  const count = document.getElementById('photosCount');
+  count.textContent = projectPhotos.length === 0 ? 'nessuna foto' : (projectPhotos.length === 1 ? '1 foto' : projectPhotos.length + ' foto');
+  if (projectPhotos.length === 0) {
+    grid.innerHTML = '<div class="photos-empty">Nessuna foto allegata. Tocca i pulsanti qui sopra per aggiungerne.</div>';
+    return;
+  }
+  grid.innerHTML = projectPhotos.map((photo, i) => `
+    <div class="photo-card" data-photo-id="${escapeHtml(photo.id)}">
+      <div class="photo-thumb">
+        <img src="${escapeHtml(photo.data)}" alt="${escapeHtml(photo.caption || 'Foto ' + (i+1))}">
+        <button type="button" class="photo-delete" aria-label="Elimina foto" data-action="delete">×</button>
+      </div>
+      <input type="text" class="photo-caption-input" placeholder="didascalia (opzionale)" value="${escapeHtml(photo.caption || '')}" maxlength="120">
+    </div>
+  `).join('');
+  // Collega eventi
+  grid.querySelectorAll('.photo-card').forEach(card => {
+    const id = card.dataset.photoId;
+    card.querySelector('.photo-thumb img').addEventListener('click', () => openLightbox(id));
+    card.querySelector('.photo-delete').addEventListener('click', e => {
+      e.stopPropagation();
+      if (!confirm('Eliminare questa foto?')) return;
+      projectPhotos = projectPhotos.filter(p => p.id !== id);
+      renderPhotos();
+    });
+    card.querySelector('.photo-caption-input').addEventListener('input', e => {
+      const photo = projectPhotos.find(p => p.id === id);
+      if (photo) photo.caption = e.target.value;
+    });
+  });
+}
+
+function openLightbox(photoId) {
+  const photo = projectPhotos.find(p => p.id === photoId);
+  if (!photo) return;
+  document.getElementById('lightboxImg').src = photo.data;
+  document.getElementById('lightboxImg').alt = photo.caption || '';
+  document.getElementById('lightboxCaption').textContent = photo.caption || '';
+  document.getElementById('lightbox').classList.add('open');
+}
+document.getElementById('lightboxClose').addEventListener('click', () => {
+  document.getElementById('lightbox').classList.remove('open');
+});
+document.getElementById('lightbox').addEventListener('click', e => {
+  if (e.target.id === 'lightbox') document.getElementById('lightbox').classList.remove('open');
+});
+
+// --- Aggiunta foto ---
+function addPhotos(fileList) {
+  const files = Array.from(fileList || []).filter(f => f.type.startsWith('image/'));
+  if (files.length === 0) return;
+  Promise.all(files.map(f => compressImage(f).catch(err => { console.warn('Errore foto:', err); return null; })))
+    .then(results => {
+      const valid = results.filter(Boolean);
+      valid.forEach(dataUrl => {
+        projectPhotos.push({
+          id: 'p' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+          caption: '',
+          data: dataUrl
+        });
+      });
+      renderPhotos();
+    });
+}
+
+document.getElementById('photoCameraBtn').addEventListener('click', () => {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  inp.capture = 'environment';
+  inp.onchange = e => addPhotos(e.target.files);
+  inp.click();
+});
+
+document.getElementById('photoGalleryBtn').addEventListener('click', () => {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  inp.multiple = true;
+  inp.onchange = e => addPhotos(e.target.files);
+  inp.click();
+});
+
+document.getElementById('notes').addEventListener('input', e => {
+  projectNotes = e.target.value;
+});
 
 function getProjects() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
@@ -790,7 +984,13 @@ function getProjects() {
 
 function setProjects(projects) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(projects)); return true; }
-  catch (e) { alert('Impossibile salvare: lo spazio disponibile è esaurito o la modalità privata blocca il salvataggio.'); return false; }
+  catch (e) {
+    const reason = e && e.name === 'QuotaExceededError'
+      ? 'Lo spazio disponibile è esaurito. Le foto occupano molto spazio: prova a eliminare progetti vecchi o a rimuovere alcune foto dal progetto attuale prima di salvare.'
+      : 'Errore nel salvataggio: ' + (e && e.message || 'sconosciuto') + '\n(In modalità privata/incognito il salvataggio non è sempre disponibile.)';
+    alert(reason);
+    return false;
+  }
 }
 
 function gatherFormData() {
@@ -799,6 +999,8 @@ function gatherFormData() {
     material: matSel.value,
     slope: document.getElementById('slope').value,
     flow: document.getElementById('flow').value,
+    notes: projectNotes || '',
+    photos: projectPhotos,
   };
   if (sectionType === 'circ') {
     data.diameter = dnSel.value;
@@ -849,6 +1051,12 @@ function applyFormData(data) {
   // 4. Pendenza, portata
   if (data.slope) document.getElementById('slope').value = data.slope;
   if (data.flow) document.getElementById('flow').value = data.flow;
+
+  // 5. Note e foto
+  projectNotes = data.notes || '';
+  document.getElementById('notes').value = projectNotes;
+  projectPhotos = Array.isArray(data.photos) ? data.photos.filter(p => p && p.data && p.id) : [];
+  renderPhotos();
 
   compute();
 }
@@ -1021,6 +1229,7 @@ document.getElementById('printBtn').addEventListener('click', () => {
 });
 
 refreshProjectList();
+renderPhotos();
 
 // Service worker registration for offline support
 if ('serviceWorker' in navigator) {
