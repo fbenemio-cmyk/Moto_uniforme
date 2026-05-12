@@ -1,7 +1,7 @@
 // Service worker per Verifica moto uniforme
 // Strategia: cache-first per gli asset locali, network-first per i font Google
 
-const CACHE_NAME = 'verifica-moto-uniforme-v1';
+const CACHE_NAME = 'verifica-moto-uniforme-v2';
 const APP_SHELL = [
   './',
   './index.html',
