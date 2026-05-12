@@ -115,7 +115,7 @@ body {
 .field label { font-size: 11.5px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; }
 .field .row { display: flex; align-items: center; gap: 8px; }
 .field input, .field select { flex: 1; min-width: 0; height: 40px; padding: 0 12px; font-family: var(--font-mono); font-size: 16px; color: var(--text-primary); background: var(--bg-card-soft); border: 1px solid var(--border-strong); border-radius: 8px; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; -moz-appearance: none; appearance: none; touch-action: manipulation; }
-.field input[type="number"] { flex: 0 1 180px; text-align: right; padding-right: 14px; -moz-appearance: textfield; }
+.field input[type="number"] { -moz-appearance: textfield; }
 .field input[type="number"]::-webkit-outer-spin-button,
 .field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 @media (max-width: 640px) {
@@ -178,15 +178,47 @@ body {
 /* Footer */
 .page-footer { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--rule); font-family: var(--font-mono); font-size: 10.5px; color: var(--text-tertiary); letter-spacing: 0.04em; text-transform: uppercase; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 
+/* Toolbar — gestione progetti e stampa */
+.toolbar { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 20px; margin-bottom: 18px; box-shadow: var(--shadow-card); display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.toolbar-info { display: flex; align-items: baseline; gap: 10px; min-width: 0; flex: 1 1 200px; }
+.toolbar-label { font-size: 11px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.07em; flex-shrink: 0; }
+.toolbar-value { font-family: var(--font-display); font-style: italic; font-size: 17px; font-variation-settings: "opsz" 20; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.toolbar-value.empty { font-style: normal; color: var(--text-tertiary); font-family: var(--font-mono); font-size: 13px; }
+.toolbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.toolbar select, .toolbar button { font-family: var(--font-body); font-size: 13px; font-weight: 500; height: 38px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--bg-card-soft); color: var(--text-primary); cursor: pointer; transition: all 0.15s; touch-action: manipulation; }
+.toolbar select { -webkit-appearance: none; appearance: none; padding-right: 30px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%238d92a0' d='M5 6 0 0h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; max-width: 200px; }
+.toolbar button:hover, .toolbar select:hover { background: var(--bg-card); border-color: var(--text-tertiary); }
+.toolbar button.primary { background: var(--accent); color: white; border-color: var(--accent); }
+.toolbar button.primary:hover { filter: brightness(1.08); }
+.toolbar button.danger { color: var(--danger); border-color: var(--danger); background: transparent; }
+.toolbar button.danger:hover { background: var(--danger-soft); }
+@media (max-width: 640px) {
+  .toolbar { padding: 14px 16px; gap: 12px; }
+  .toolbar-info { width: 100%; flex: none; justify-content: space-between; }
+  .toolbar-actions { width: 100%; }
+  .toolbar select, .toolbar button { flex: 1 1 auto; height: 42px; min-width: 0; }
+  .toolbar select { max-width: none; }
+}
+
+/* Print header (visibile solo in stampa) */
+.print-header { display: none; }
+
 /* Print */
 @media print {
   html, body { background: white !important; }
-  body { background-image: none !important; }
-  .page { padding: 0; max-width: none; }
+  body { background-image: none !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
+  .page { padding: 16px 0 0; max-width: none; }
+  .toolbar, .ask-row { display: none !important; }
+  .print-header { display: block; padding: 0 0 14px; margin-bottom: 18px; border-bottom: 1.5px solid #444; font-size: 12px; color: #333; line-height: 1.5; }
+  .print-header .row { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .print-header strong { font-weight: 600; }
   .panel { box-shadow: none; border-color: #ccc; break-inside: avoid; }
-  .field input, .field select { border-color: #ccc; }
-  .page-header { border-color: #ccc; }
-  .note { background: white; border-color: #ddd; }
+  .field input, .field select { border-color: #ccc; background: #fafafa; }
+  .page-header { border-color: #ccc; padding-bottom: 14px; margin-bottom: 14px; }
+  .note { background: white; border-color: #ddd; break-inside: avoid; }
+  .status.good { background: #f0f9f1 !important; color: #1e5a3e !important; border-color: #c4dccc !important; }
+  .status.warn { background: #fcf2ed !important; color: #7a3019 !important; border-color: #e5c2af !important; }
+  .status.bad { background: #fce8e2 !important; color: #6d2317 !important; border-color: #e5b6ab !important; }
 }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
@@ -212,6 +244,34 @@ body {
   </div>
   <div class="tag">v 1.0</div>
 </header>
+
+<section class="toolbar" aria-label="Gestione progetti e stampa">
+  <div class="toolbar-info">
+    <span class="toolbar-label">Progetto</span>
+    <span class="toolbar-value empty" id="currentProjectName">— non salvato —</span>
+  </div>
+  <div class="toolbar-actions">
+    <select id="projectLoad" title="Apri progetto salvato" aria-label="Apri progetto salvato">
+      <option value="">Apri progetto…</option>
+    </select>
+    <button id="saveBtn" type="button" title="Salva i dati di input come progetto">Salva</button>
+    <button id="exportBtn" type="button" title="Esporta il progetto attuale come file .json">Esporta</button>
+    <button id="importBtn" type="button" title="Importa un progetto da file .json">Importa</button>
+    <button id="deleteBtn" type="button" class="danger" style="display:none" title="Elimina il progetto attualmente aperto">Elimina</button>
+    <button id="printBtn" type="button" class="primary" title="Stampa o esporta in PDF">Stampa PDF</button>
+  </div>
+</section>
+
+<div class="print-header" aria-hidden="true">
+  <div class="row">
+    <div><strong>Verifica moto uniforme</strong> — Manning–Strickler</div>
+    <div>Progetto: <strong id="printProjectName">—</strong></div>
+  </div>
+  <div class="row">
+    <div>Sezione: <strong id="printSection">—</strong></div>
+    <div>Stampato il <strong id="printDate">—</strong></div>
+  </div>
+</div>
 
 <h2 class="sr-only">Applicazione di verifica del moto uniforme</h2>
 
@@ -716,6 +776,251 @@ matSel.addEventListener('change', () => {
 
 populateDiameters('pvc_sn8', 300);
 compute();
+
+// ===========================================
+// GESTIONE PROGETTI (localStorage) e STAMPA
+// ===========================================
+const STORAGE_KEY = 'moto_uniforme_projects';
+let currentProjectName = '';
+
+function getProjects() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+  catch (e) { return {}; }
+}
+
+function setProjects(projects) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(projects)); return true; }
+  catch (e) { alert('Impossibile salvare: lo spazio disponibile è esaurito o la modalità privata blocca il salvataggio.'); return false; }
+}
+
+function gatherFormData() {
+  const data = {
+    sectionType,
+    material: matSel.value,
+    slope: document.getElementById('slope').value,
+    flow: document.getElementById('flow').value,
+  };
+  if (sectionType === 'circ') {
+    data.diameter = dnSel.value;
+    if (dnSel.value === 'custom') data.diameterCustom = customInput.value;
+  } else {
+    data.base = document.getElementById('base').value;
+    data.height = document.getElementById('height').value;
+  }
+  return data;
+}
+
+function applyFormData(data) {
+  // 1. Tipo di sezione
+  const st = data.sectionType || 'circ';
+  sectionSel.value = st;
+  sectionType = st;
+  document.querySelectorAll('.circ-only').forEach(el => el.style.display = st === 'circ' ? '' : 'none');
+  document.querySelectorAll('.rect-only').forEach(el => el.style.display = st === 'rect' ? '' : 'none');
+  document.getElementById('barTitle').textContent = st === 'circ' ? 'h/D (%)' : 'h/H (%)';
+  document.getElementById('fillStatLabel').textContent = st === 'circ' ? 'Grado riempimento h/D' : 'Grado riempimento h/H';
+
+  // 2. Materiale (e ripopolamento diametri)
+  if (data.material && materials[data.material]) {
+    matSel.value = data.material;
+    if (st === 'circ') {
+      const targetDi = data.diameter === 'custom' ? parseFloat(data.diameterCustom) : parseFloat(data.diameter);
+      populateDiameters(data.material, isNaN(targetDi) ? 300 : targetDi);
+    }
+  }
+
+  // 3. Diametro (circolare) o B/H (rettangolare)
+  if (st === 'circ') {
+    if (data.diameter === 'custom' && data.diameterCustom) {
+      dnSel.value = 'custom';
+      customInput.value = data.diameterCustom;
+      customInput.style.display = '';
+    } else if (data.diameter) {
+      // Cerca un'opzione esatta; se non esiste, fallback al primo disponibile
+      const exists = Array.from(dnSel.options).some(o => o.value === data.diameter);
+      dnSel.value = exists ? data.diameter : (dnSel.options[0] ? dnSel.options[0].value : '');
+      customInput.style.display = dnSel.value === 'custom' ? '' : 'none';
+    }
+  } else {
+    if (data.base) document.getElementById('base').value = data.base;
+    if (data.height) document.getElementById('height').value = data.height;
+  }
+
+  // 4. Pendenza, portata
+  if (data.slope) document.getElementById('slope').value = data.slope;
+  if (data.flow) document.getElementById('flow').value = data.flow;
+
+  compute();
+}
+
+function refreshProjectList() {
+  const sel = document.getElementById('projectLoad');
+  const projects = getProjects();
+  const names = Object.keys(projects).sort((a, b) => a.localeCompare(b, 'it'));
+  sel.innerHTML = '<option value="">Apri progetto…</option>';
+  names.forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = name;
+    sel.appendChild(opt);
+  });
+  if (currentProjectName && names.includes(currentProjectName)) sel.value = currentProjectName;
+}
+
+function setCurrentProject(name) {
+  currentProjectName = name || '';
+  const lbl = document.getElementById('currentProjectName');
+  if (currentProjectName) {
+    lbl.textContent = currentProjectName;
+    lbl.classList.remove('empty');
+    document.getElementById('deleteBtn').style.display = '';
+  } else {
+    lbl.textContent = '— non salvato —';
+    lbl.classList.add('empty');
+    document.getElementById('deleteBtn').style.display = 'none';
+  }
+}
+
+// SALVA
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const defaultName = currentProjectName || '';
+  const input = prompt('Nome del progetto:', defaultName);
+  if (input === null) return;
+  const name = input.trim();
+  if (!name) { alert('Il nome del progetto non può essere vuoto.'); return; }
+  const projects = getProjects();
+  if (projects[name] && name !== currentProjectName) {
+    if (!confirm(`Esiste già un progetto chiamato "${name}". Vuoi sovrascriverlo?`)) return;
+  }
+  const data = gatherFormData();
+  data.savedAt = new Date().toISOString();
+  projects[name] = data;
+  if (!setProjects(projects)) return;
+  setCurrentProject(name);
+  refreshProjectList();
+});
+
+// APRI
+document.getElementById('projectLoad').addEventListener('change', e => {
+  const name = e.target.value;
+  if (!name) return;
+  const projects = getProjects();
+  if (!projects[name]) { alert('Progetto non trovato.'); refreshProjectList(); return; }
+  applyFormData(projects[name]);
+  setCurrentProject(name);
+});
+
+// ELIMINA
+document.getElementById('deleteBtn').addEventListener('click', () => {
+  if (!currentProjectName) return;
+  if (!confirm(`Eliminare definitivamente il progetto "${currentProjectName}"?`)) return;
+  const projects = getProjects();
+  delete projects[currentProjectName];
+  if (!setProjects(projects)) return;
+  setCurrentProject('');
+  refreshProjectList();
+});
+
+// ESPORTA — scarica come file .json
+function sanitizeFilename(name) {
+  return name.replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, '_').slice(0, 80) || 'progetto';
+}
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+  let name = currentProjectName;
+  if (!name) {
+    const input = prompt('Nome del progetto da esportare:', '');
+    if (input === null) return;
+    name = input.trim();
+    if (!name) { alert('Inserisci un nome per il file.'); return; }
+  }
+  const data = gatherFormData();
+  data.format = 'verifica-moto-uniforme-project';
+  data.appVersion = '1.0';
+  data.name = name;
+  data.exportedAt = new Date().toISOString();
+  // Per leggibilità: anche etichette descrittive
+  data.sectionTypeLabel = data.sectionType === 'circ' ? 'Circolare' : 'Rettangolare scatolare';
+  data.materialLabel = (materials[data.material] && materials[data.material].name) || data.material;
+
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = sanitizeFilename(name) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 200);
+});
+
+// IMPORTA — carica da file .json
+document.getElementById('importBtn').addEventListener('click', () => {
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'application/json,.json';
+  fileInput.style.display = 'none';
+  fileInput.addEventListener('change', ev => {
+    const file = ev.target.files && ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      let data;
+      try { data = JSON.parse(e.target.result); }
+      catch (err) { alert('Il file non è un JSON valido:\n' + err.message); return; }
+
+      // Validazione formato
+      if (data.format && data.format !== 'verifica-moto-uniforme-project') {
+        if (!confirm('Il file non sembra un progetto di questa app. Provare ad aprirlo comunque?')) return;
+      }
+      if (!data.sectionType || !data.material) {
+        alert('Il file non contiene dati di progetto validi (mancano tipo di sezione o materiale).');
+        return;
+      }
+      if (!materials[data.material]) {
+        alert(`Il materiale "${data.material}" non è presente nel database della app.\nVerifica di avere la versione aggiornata.`);
+        return;
+      }
+
+      applyFormData(data);
+      const importedName = (data.name || file.name.replace(/\.json$/i, '')).trim();
+
+      if (confirm(`Progetto "${importedName}" caricato con successo.\n\nVuoi salvarlo anche nell'archivio del browser, così potrai riaprirlo senza dover ricaricare il file?`)) {
+        const projects = getProjects();
+        if (projects[importedName] && !confirm(`Esiste già un progetto chiamato "${importedName}" nell'archivio. Sovrascriverlo?`)) {
+          setCurrentProject(importedName);
+          return;
+        }
+        const toSave = gatherFormData();
+        toSave.savedAt = new Date().toISOString();
+        projects[importedName] = toSave;
+        if (setProjects(projects)) {
+          setCurrentProject(importedName);
+          refreshProjectList();
+        }
+      } else {
+        setCurrentProject(importedName);
+      }
+    };
+    reader.readAsText(file);
+  });
+  document.body.appendChild(fileInput);
+  fileInput.click();
+  setTimeout(() => { if (fileInput.parentNode) document.body.removeChild(fileInput); }, 1000);
+});
+
+// STAMPA / PDF
+document.getElementById('printBtn').addEventListener('click', () => {
+  document.getElementById('printProjectName').textContent = currentProjectName || 'non salvato';
+  const stLabel = sectionType === 'circ' ? 'Circolare' : 'Rettangolare scatolare';
+  const matLabel = (materials[matSel.value] && materials[matSel.value].name) || matSel.value;
+  document.getElementById('printSection').textContent = `${stLabel} · ${matLabel}`;
+  document.getElementById('printDate').textContent = new Date().toLocaleString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  setTimeout(() => window.print(), 50);
+});
+
+refreshProjectList();
 
 // Service worker registration for offline support
 if ('serviceWorker' in navigator) {
